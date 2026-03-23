@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COURTS Malaysia Instalment Calculator</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;--card:#ffffff;--text:#132b7a;--muted:#5b668a;--yellow:#f4be21;
+      --blue:#1f3f98;--blue-dark:#132b7a;--red:#ef1c25;--line:#dde3f0;
+      --shadow:0 12px 28px rgba(19,43,122,.12);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial, Helvetica, sans-serif;background:linear-gradient(180deg,#fff9e8 0%, var(--bg) 100%);color:var(--text);}
+    .wrap{max-width:460px;margin:0 auto;padding:14px 14px 28px;}
+    .hero{position:relative;overflow:hidden;background:var(--yellow);border-radius:26px;box-shadow:var(--shadow);padding:18px 18px 96px;}
+    .logo-badge{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--blue);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.08);margin-bottom:12px;}
+    .logo-badge .nojima{border-left:1px solid #d6dcef;padding-left:8px;}
+    .hero h1{margin:0;font-size:30px;line-height:1.08;font-weight:800;color:var(--blue-dark);text-transform:uppercase;max-width:300px;}
+    .wave{position:absolute;left:-10%;right:-10%;bottom:-35px;height:120px;background:var(--blue);border-top-left-radius:70% 100%;border-top-right-radius:40% 100%;}
+    .wave:before{content:"";position:absolute;left:-5%;right:-5%;top:18px;height:18px;border-top:4px solid var(--yellow);border-bottom:4px solid var(--yellow);border-radius:50%;transform:rotate(-2deg);opacity:.95;}
+    .wave:after{content:"";position:absolute;left:0;right:0;top:40px;height:100px;background:var(--blue);}
+    .hero-bottom-text{position:absolute;left:18px;right:18px;bottom:14px;color:#fff;z-index:2;}
+    .hero-bottom-text .big{font-weight:800;font-size:13px;text-transform:uppercase;}
+    .hero-bottom-text .small{font-size:10px;opacity:.9;margin-top:2px;text-transform:uppercase;}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-top:14px;border:1px solid #edf1f7;}
+    .pill{display:inline-block;background:#eef3ff;color:var(--blue-dark);border:1px solid #dce6ff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;margin-bottom:12px;}
+    .label{display:block;font-size:14px;font-weight:800;margin-bottom:8px;color:var(--blue-dark);}
+    .sub{font-size:12px;color:var(--muted);margin:-3px 0 8px;}
+    input{width:100%;border:1px solid var(--line);border-radius:16px;padding:15px 14px;font-size:18px;font-weight:800;outline:none;background:#fff;color:var(--blue-dark);}
+    input.money{font-size:22px;}
+    input:focus{border-color:#f1c84c;box-shadow:0 0 0 4px rgba(244,190,33,.18);}
+    .grid2,.grid3{display:grid;gap:10px;}
+    .grid2{grid-template-columns:1fr 1fr;}
+    .grid3{grid-template-columns:1fr 1fr 1fr;}
+    .sku-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;}
+    button.option, button.fetch-btn{border:1px solid var(--line);background:#fff;color:var(--blue-dark);border-radius:16px;padding:14px 10px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s ease;min-height:54px;}
+    button.option.active{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 8px 20px rgba(239,28,37,.18);}
+    button.fetch-btn{background:var(--blue);color:#fff;border-color:var(--blue);padding:15px 16px;min-width:112px;}
+    button.fetch-btn:disabled{opacity:.6;cursor:not-allowed;}
+    .status{margin-top:10px;padding:10px 12px;border-radius:14px;font-size:12px;line-height:1.45;display:none;}
+    .status.show{display:block;}
+    .status.info{background:#eef3ff;color:var(--blue-dark);border:1px solid #dce6ff;}
+    .status.error{background:#fff1f2;color:#991b1b;border:1px solid #fecdd3;}
+    .status.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
+    .product-box{display:none;margin-top:10px;background:#f8fbff;border:1px solid #dce6ff;border-radius:16px;padding:12px;}
+    .product-box.show{display:block;}
+    .product-title{font-size:13px;font-weight:800;line-height:1.35;color:var(--blue-dark);}
+    .product-link{font-size:12px;word-break:break-all;color:var(--blue);margin-top:6px;display:block;}
+    .result{background:linear-gradient(180deg,var(--blue) 0%, var(--blue-dark) 100%);color:#fff;border-radius:22px;padding:18px;margin-top:14px;}
+    .caption{font-size:12px;color:#dfe7ff;text-transform:uppercase;letter-spacing:.5px;}
+    .amount{font-size:34px;font-weight:800;margin:8px 0 14px;line-height:1.1;}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.14);font-size:14px;}
+    .row span:first-child{color:#dfe7ff}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
+    th, td{text-align:right;padding:12px 8px;border-bottom:1px solid var(--line);}
+    th:first-child, td:first-child{text-align:left}
+    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="logo-badge"><span>COURTS Malaysia</span><span class="nojima">Nojima</span></div>
+      <h1>Instalment Calculator</h1>
+      <div class="wave"></div>
+      <div class="hero-bottom-text">
+        <div class="big">Flexible Payments, Seamless Shopping</div>
+        <div class="small">Cash, Card, E-Wallet, or COURTS EZ Payment Plan</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pill">COURTS Malaysia Instalment Calculator</div>
+
+      <label class="label" for="sku">IP Code / SKU</label>
+      <div class="sub">Enter code like IP50825 and tap Fetch Price</div>
+      <div class="sku-row">
+        <input id="sku" type="text" placeholder="Enter IP code" value="IP50825" />
+        <button id="fetchPriceBtn" class="fetch-btn">Fetch Price</button>
+      </div>
+      <div id="status" class="status info"></div>
+      <div id="productBox" class="product-box">
+        <div id="productTitle" class="product-title"></div>
+        <a id="productLink" class="product-link" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <label class="label" for="principal">Purchase Amount ( RM)</label>
+      <input id="principal" class="money" type="number" value="1279" min="0" step="0.01" placeholder="Enter amount" />
+
+      <div style="height:16px"></div>
+
+      <label class="label">Rate of Interest</label>
+      <div class="grid2">
+        <button class="option rate-btn" data-rate="0.99">0.99% / month</button>
+        <button class="option rate-btn active" data-rate="1.25">1.25% / month</button>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <label class="label">Tenor</label>
+      <div class="grid3">
+        <button class="option tenor-btn" data-tenor="12">12 months</button>
+        <button class="option tenor-btn" data-tenor="24">24 months</button>
+        <button class="option tenor-btn" data-tenor="36">36 months</button>
+        <button class="option tenor-btn" data-tenor="48">48 months</button>
+        <button class="option tenor-btn active" data-tenor="60">60 months</button>
+      </div>
+
+      <div class="result">
+        <div class="caption">Monthly Instalment</div>
+        <div class="amount" id="installment">RM 0.00</div>
+        <div class="row"><span>Total Purchase Amount</span><strong id="purchaseAmount">RM 0.00</strong></div>
+        <div class="row"><span>Total Interest</span><strong id="totalInterest">RM 0.00</strong></div>
+        <div class="row"><span>Total Payment</span><strong id="totalPayment">RM 0.00</strong></div>
+        <div class="row"><span>Rate of Interest</span><strong id="selectedRateText">1.25% / month</strong></div>
+        <div class="row"><span>Tenor</span><strong id="selectedTenorText">60 months</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="label">All Instalment Options for Selected Rate</label>
+      <table>
+        <thead><tr><th>Tenor</th><th>Monthly Instalment</th></tr></thead>
+        <tbody id="optionsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const principalInput = document.getElementById('principal');
+    const skuInput = document.getElementById('sku');
+    const fetchPriceBtn = document.getElementById('fetchPriceBtn');
+    const statusEl = document.getElementById('status');
+    const productBox = document.getElementById('productBox');
+    const productTitleEl = document.getElementById('productTitle');
+    const productLinkEl = document.getElementById('productLink');
+    const installmentEl = document.getElementById('installment');
+    const purchaseAmountEl = document.getElementById('purchaseAmount');
+    const totalPaymentEl = document.getElementById('totalPayment');
+    const totalInterestEl = document.getElementById('totalInterest');
+    const selectedRateText = document.getElementById('selectedRateText');
+    const selectedTenorText = document.getElementById('selectedTenorText');
+    const optionsTable = document.getElementById('optionsTable');
+
+    let selectedRate = 1.25;
+    let selectedTenor = 60;
+    const tenors = [12, 24, 36, 48, 60];
+
+    function setStatus(message, type = 'info') {
+      statusEl.textContent = message;
+      statusEl.className = `status show ${type}`;
+    }
+
+    function showProductInfo(title, url) {
+      if (!title && !url) {
+        productBox.classList.remove('show');
+        productTitleEl.textContent = '';
+        productLinkEl.textContent = '';
+        productLinkEl.removeAttribute('href');
+        return;
+      }
+      productTitleEl.textContent = title || '';
+      productLinkEl.textContent = url || '';
+      productLinkEl.href = url || '#';
+      productBox.classList.add('show');
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('en-MY', {
+        style: 'currency',
+        currency: 'MYR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value || 0);
+    }
+
+    function calculateInstallment(principal, monthlyRatePercent, months) {
+      const p = Number(principal);
+      const r = Number(monthlyRatePercent) / 100;
+      const n = Number(months);
+      if (!p || p <= 0 || !r || r <= 0 || !n || n <= 0) {
+        return { installment: 0, totalPayment: 0, totalInterest: 0, purchaseAmount: 0 };
+      }
+      const totalInterest = p * r * n;
+      const totalPayment = p + totalInterest;
+      const installment = totalPayment / n;
+      return { installment, totalPayment, totalInterest, purchaseAmount: p };
+    }
+
+    function render() {
+      const principal = parseFloat(principalInput.value) || 0;
+      const result = calculateInstallment(principal, selectedRate, selectedTenor);
+      installmentEl.textContent = formatMoney(result.installment);
+      purchaseAmountEl.textContent = formatMoney(result.purchaseAmount);
+      totalPaymentEl.textContent = formatMoney(result.totalPayment);
+      totalInterestEl.textContent = formatMoney(result.totalInterest);
+      selectedRateText.textContent = selectedRate.toFixed(2) + '% / month';
+      selectedTenorText.textContent = selectedTenor + ' months';
+
+      optionsTable.innerHTML = '';
+      tenors.forEach(month => {
+        const r = calculateInstallment(principal, selectedRate, month);
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${month} months</td><td>${formatMoney(r.installment)}</td>`;
+        optionsTable.appendChild(row);
+      });
+    }
+
+    async function fetchPrice() {
+      const sku = skuInput.value.trim().toUpperCase();
+      if (!sku) {
+        setStatus('Please enter an IP code / SKU first.', 'error');
+        return;
+      }
+      fetchPriceBtn.disabled = true;
+      setStatus('Fetching price from COURTS website...', 'info');
+      showProductInfo('', '');
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-price?sku=${encodeURIComponent(sku)}`);
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || 'Unable to fetch price.');
+        }
+        principalInput.value = data.numericPrice.toFixed(2).replace(/\.00$/, '');
+        render();
+        showProductInfo(data.title, data.productUrl);
+        setStatus(`Price found for ${data.sku}: ${formatMoney(data.numericPrice)}`, 'success');
+      } catch (err) {
+        setStatus(err.message || 'Price lookup failed.', 'error');
+      } finally {
+        fetchPriceBtn.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('.rate-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedRate = parseFloat(btn.dataset.rate);
+        render();
+      });
+    });
+
+    document.querySelectorAll('.tenor-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tenor-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTenor = parseInt(btn.dataset.tenor);
+        render();
+      });
+    });
+
+    principalInput.addEventListener('input', render);
+    fetchPriceBtn.addEventListener('click', fetchPrice);
+    skuInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') fetchPrice(); });
+
+    render();
+  </script>
+</body>
+</html>
